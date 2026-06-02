@@ -13,3 +13,5 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
 add_executable(app ${SOURCES})
 
 target_include_directories(app PRIVATE include)
+
+target_link_libraries(app PRIVATE iphlpapi ws2_32)
