@@ -1,6 +1,8 @@
 #pragma once
 
 #include "core/detection_result.hpp"
+
+#include <string>
 #include <vector>
 
 namespace kld

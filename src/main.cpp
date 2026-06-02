@@ -1,5 +1,6 @@
-#include "helper.hpp"
+#include "core/detector_registry.hpp"
 #include "detectors/dummy_detector.hpp"
+#include "helper.hpp"
 
 #include <memory>
 #include <vector>
@@ -10,17 +11,16 @@ int main()
 
     print_banner();
 
-    std::vector<std::unique_ptr<IDetector>> detectors;
-    detectors.emplace_back(std::make_unique<DummyDetector>());
+    DetectorRegistry registry;
+    registry.add(std::make_unique<DummyDetector>());
 
     std::vector<DetectionResult> results;
-    results.reserve(detectors.size());
+    results.reserve(registry.detectors().size());
 
-    for (const auto& detector : detectors)
+    for (const auto& detector : registry.detectors())
     {
         DetectionResult result = detector->scan();
 
-        // Safety net: if a detector forgot to set its name
         if (result.detectorName.empty())
         {
             result.detectorName = detector->name();

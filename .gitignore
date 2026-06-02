@@ -1,4 +1,4 @@
-# Build directory
+# Build output
 build/
 
 # Executables
@@ -19,15 +19,16 @@ build/
 *.dll
 *.dylib
 
-# CMake files
+# CMake generated files
 CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
 compile_commands.json
 Makefile
 
-# VSCode
-.vscode/
+# VS Code local-only files
+.vscode/*.log
+.vscode/ipch/
 
 # macOS
 .DS_Store
