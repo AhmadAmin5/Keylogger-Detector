@@ -1,6 +1,7 @@
 #include "core/detector_registry.hpp"
 #include "detectors/keyboard_hook_heuristic_detector.hpp"
 #include "detectors/network_beacon_detector.hpp"
+#include "detectors/foreground_window_correlation_detector.hpp"
 #include "detectors/python_artifact_detector.hpp"
 #include "detectors/pyinstaller_detector.hpp"
 #include "core/console.hpp"
@@ -46,6 +47,7 @@ int main()
     registry.add(std::make_unique<PyInstallerDetector>());
     registry.add(std::make_unique<PythonArtifactDetector>());
     registry.add(std::make_unique<NetworkBeaconDetector>());
+    registry.add(std::make_unique<ForegroundWindowCorrelationDetector>());
     registry.add(std::make_unique<KeyboardHookHeuristicDetector>());
 
     std::vector<DetectionResult> results;
