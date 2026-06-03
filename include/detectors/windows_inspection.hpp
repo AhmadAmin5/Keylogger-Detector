@@ -25,6 +25,7 @@ namespace kld
 
     std::vector<ProcessRecord> enumerate_processes();
     std::vector<TcpConnectionRecord> enumerate_tcp_connections();
+    std::wstring get_current_process_image_name();
 
     bool file_contains_markers(
         const std::wstring& path,

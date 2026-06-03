@@ -153,6 +153,7 @@ namespace kld
         result.detectorName = name();
 
         const DWORD selfPid = GetCurrentProcessId();
+        const std::string selfName = wide_to_utf8(get_current_process_image_name());
         const auto connections = enumerate_tcp_connections();
 
         std::vector<std::string> evidence;
@@ -180,6 +181,15 @@ namespace kld
             }
 
             std::string procName = process_name_for_pid(conn.pid);
+            std::string lowerProcName = procName;
+            std::transform(lowerProcName.begin(), lowerProcName.end(), lowerProcName.begin(), [](unsigned char c) {
+                return static_cast<char>(std::tolower(c));
+            });
+            if (lowerProcName == selfName)
+            {
+                continue;
+            }
+
             if (mode == OutputMode::SuspiciousScan && is_legit_process(procName))
             {
                 continue;

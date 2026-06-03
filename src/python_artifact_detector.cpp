@@ -74,6 +74,7 @@ namespace kld
         result.detectorName = name();
 
         const DWORD selfPid = GetCurrentProcessId();
+        const std::wstring selfName = get_current_process_image_name();
 
         const std::vector<std::string> markers =
         {
@@ -96,6 +97,15 @@ namespace kld
         for (const auto& proc : processes)
         {
             if (proc.pid == selfPid)
+            {
+                continue;
+            }
+
+            std::wstring lowerName = proc.imageName;
+            std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(), [](wchar_t c) {
+                return std::towlower(c);
+            });
+            if (lowerName == selfName)
             {
                 continue;
             }

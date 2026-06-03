@@ -173,6 +173,22 @@ namespace kld
         return processes;
     }
 
+    std::wstring get_current_process_image_name()
+    {
+        wchar_t path[32768]{};
+        if (GetModuleFileNameW(nullptr, path, 32768) == 0)
+        {
+            return L"app.exe";
+        }
+        std::wstring selfPath(path);
+        std::size_t pos = selfPath.find_last_of(L"\\/");
+        std::wstring name = (pos == std::wstring::npos) ? selfPath : selfPath.substr(pos + 1);
+        std::transform(name.begin(), name.end(), name.begin(), [](wchar_t c) {
+            return std::towlower(c);
+        });
+        return name;
+    }
+
     std::vector<TcpConnectionRecord> enumerate_tcp_connections()
     {
         std::vector<TcpConnectionRecord> connections;
