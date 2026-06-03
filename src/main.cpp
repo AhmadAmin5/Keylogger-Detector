@@ -11,6 +11,9 @@
 #include <string>
 #include <vector>
 #include <conio.h>
+#include <future>
+#include <chrono>
+#include <thread>
 
 int main()
 {
@@ -49,11 +52,35 @@ int main()
 
     for (const auto& detector : registry.detectors())
     {
-        DetectionResult result = detector->scan(mode);
+        std::string name = detector->name();
+        IDetector* rawDetector = detector.get();
+
+        // Run the scan asynchronously on a background thread
+        auto futureResult = std::async(std::launch::async, [rawDetector, mode]() {
+            return rawDetector->scan(mode);
+        });
+
+        // Spinner animation loop
+        const char spinner[] = {'|', '/', '-', '\\'};
+        int spinnerIndex = 0;
+
+        while (futureResult.wait_for(std::chrono::milliseconds(80)) != std::future_status::ready)
+        {
+            std::cout << "\r  " << console::cyan("[~]") 
+                      << " Scanning with " << console::bold(name) 
+                      << "... " << console::bright_cyan(std::string(1, spinner[spinnerIndex])) << std::flush;
+            spinnerIndex = (spinnerIndex + 1) % 4;
+        }
+
+        // Clear the spinner / loading line completely
+        std::cout << "\r" << std::string(name.length() + 30, ' ') << "\r" << std::flush;
+
+        // Retrieve result
+        DetectionResult result = futureResult.get();
 
         if (result.detectorName.empty())
         {
-            result.detectorName = detector->name();
+            result.detectorName = name;
         }
 
         print_result(result);
