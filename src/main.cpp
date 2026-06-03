@@ -3,6 +3,7 @@
 #include "detectors/network_beacon_detector.hpp"
 #include "detectors/python_artifact_detector.hpp"
 #include "detectors/pyinstaller_detector.hpp"
+#include "core/console.hpp"
 #include "helper.hpp"
 
 #include <iostream>
@@ -15,11 +16,12 @@ int main()
 {
     using namespace kld;
 
+    console::init();
     print_banner();
 
-    std::cout << "Select scan mode:\n";
-    std::cout << "1. Full scan (shows all outputs)\n";
-    std::cout << "2. Suspicious scan (shows filtered outputs)\n";
+    std::cout << console::bold("Select scan mode:\n");
+    std::cout << "1. " << console::cyan("Full scan") << " (shows all outputs)\n";
+    std::cout << "2. " << console::bright_cyan("Suspicious scan") << " (shows filtered outputs, recommended)\n";
     std::cout << "Choice [1/2, default: 2]: ";
     std::string choice;
     std::getline(std::cin, choice);
@@ -28,12 +30,12 @@ int main()
     if (choice == "1")
     {
         mode = OutputMode::FullScan;
-        std::cout << "\nRunning Full Scan...\n\n";
+        std::cout << "\nRunning " << console::bold(console::cyan("Full Scan")) << "...\n\n";
     }
     else
     {
         mode = OutputMode::SuspiciousScan;
-        std::cout << "\nRunning Suspicious Scan...\n\n";
+        std::cout << "\nRunning " << console::bold(console::bright_cyan("Suspicious Scan")) << "...\n\n";
     }
 
     DetectorRegistry registry;
@@ -60,6 +62,7 @@ int main()
 
     print_summary(results);
 
+    std::cout << console::grey("\nPress any key to exit...");
     getch();
     return 0;
-}
+}
