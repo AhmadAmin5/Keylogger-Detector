@@ -14,8 +14,10 @@
 #include <string>
 #include <vector>
 
+#ifdef _MSC_VER
 #pragma comment(lib, "iphlpapi.lib")
 #pragma comment(lib, "ws2_32.lib")
+#endif
 
 namespace kld
 {
@@ -48,37 +50,6 @@ namespace kld
             }
 
             return out;
-        }
-
-        bool is_private_ipv4(const std::wstring& address)
-        {
-            int a = 0, b = 0, c = 0, d = 0;
-            if (swscanf(address.c_str(), L"%d.%d.%d.%d", &a, &b, &c, &d) != 4)
-            {
-                return false;
-            }
-
-            if (a == 10)
-            {
-                return true;
-            }
-
-            if (a == 192 && b == 168)
-            {
-                return true;
-            }
-
-            if (a == 172 && b >= 16 && b <= 31)
-            {
-                return true;
-            }
-
-            if (a == 169 && b == 254)
-            {
-                return true;
-            }
-
-            return false;
         }
 
         std::wstring endpoint_to_wstring(const sockaddr_in& addr)

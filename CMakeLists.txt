@@ -48,17 +48,10 @@ target_link_libraries(app PRIVATE
 # =========================
 if(MINGW)
 
-    # Statically link:
-    # - libgcc
-    # - libstdc++
-    # - winpthread
-
     target_link_options(app PRIVATE
+        -static
         -static-libgcc
         -static-libstdc++
-        -Wl,-Bstatic
-        -lwinpthread
-        -Wl,-Bdynamic
     )
 
 endif()
