@@ -204,10 +204,13 @@ namespace kld
                 "textinputhost.exe",
                 "startmenuexperiencehost.exe",
                 "crossdeviceservice.exe",
+                "phoneexperiencehost.exe",
+                "backgroundtaskhost.exe",
 
                 "windefend.exe",
                 "securityhealthservice.exe",
                 "securityhealthsystray.exe",
+                "mpdefendercoreservice.exe",
 
                 "onedrive.exe",
                 "teams.exe",
@@ -215,6 +218,8 @@ namespace kld
                 "steam.exe",
                 "spotify.exe",
                 "warp-svc.exe",
+                "whatsapp.root.exe",
+                "whatsapp.exe",
 
                 "node.exe",
                 "code.exe",
