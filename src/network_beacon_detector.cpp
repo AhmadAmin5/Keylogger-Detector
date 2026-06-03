@@ -128,7 +128,9 @@ namespace kld
                 "node.exe",
                 "esrv.exe",
                 "lenovovantage",
-                "antigravity ide.exe"
+                "antigravity ide.exe",
+                "windowsterminal.exe",
+                "openconsole.exe"
             };
 
             for (const auto& name : excluded_names)

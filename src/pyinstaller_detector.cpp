@@ -49,7 +49,9 @@ namespace kld
                 L"notepad.exe",
                 L"node.exe",
                 L"esrv.exe",
-                L"lenovovantage"
+                L"lenovovantage",
+                L"windowsterminal.exe",
+                L"openconsole.exe"
             };
 
             for (const auto& name : excluded_names)
