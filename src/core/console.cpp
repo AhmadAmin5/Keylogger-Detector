@@ -164,4 +164,28 @@ namespace kld::console
         }
         return green(text);
     }
+
+    void set_cursor_visible(bool visible)
+    {
+#ifdef _WIN32
+        HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+        if (hOut != INVALID_HANDLE_VALUE)
+        {
+            CONSOLE_CURSOR_INFO cursorInfo;
+            if (GetConsoleCursorInfo(hOut, &cursorInfo))
+            {
+                cursorInfo.bVisible = visible ? TRUE : FALSE;
+                SetConsoleCursorInfo(hOut, &cursorInfo);
+            }
+        }
+#endif
+        if (visible)
+        {
+            std::cout << "\033[?25h" << std::flush;
+        }
+        else
+        {
+            std::cout << "\033[?25l" << std::flush;
+        }
+    }
 }

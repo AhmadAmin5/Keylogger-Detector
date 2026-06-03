@@ -36,4 +36,7 @@ namespace kld::console
     // Contextual/Semantic color helpers
     std::string colorize_risk(int score, std::string_view text);
     std::string colorize_suspicious(bool suspicious, std::string_view text);
+
+    // Cursor visibility control
+    void set_cursor_visible(bool visible);
 }

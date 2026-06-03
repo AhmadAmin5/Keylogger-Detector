@@ -78,7 +78,7 @@ namespace kld
                 std::string line;
                 while (std::getline(iss, line))
                 {
-                    std::cout << "               " << console::grey(line) << "\n";
+                    std::cout << "    " << console::grey(line) << "\n";
                 }
                 std::cout << "\n";
             }
@@ -133,4 +133,4 @@ namespace kld
             std::cout << console::bright_green(border);
         }
     }
-}
+}

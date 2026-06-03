@@ -28,6 +28,7 @@ int main()
     std::cout << "Choice [1/2, default: 2]: ";
     std::string choice;
     std::getline(std::cin, choice);
+    console::set_cursor_visible(false);
 
     OutputMode mode = OutputMode::SuspiciousScan;
     if (choice == "1")
@@ -66,7 +67,7 @@ int main()
 
         while (futureResult.wait_for(std::chrono::milliseconds(80)) != std::future_status::ready)
         {
-            std::cout << "\r  " << console::cyan("[~]") 
+            std::cout << "\r" << console::cyan("[~]") 
                       << " Scanning with " << console::bold(name) 
                       << "... " << console::bright_cyan(std::string(1, spinner[spinnerIndex])) << std::flush;
             spinnerIndex = (spinnerIndex + 1) % 4;
@@ -91,5 +92,6 @@ int main()
 
     std::cout << console::grey("\nPress any key to exit...");
     getch();
+    console::set_cursor_visible(true);
     return 0;
-}
+}
