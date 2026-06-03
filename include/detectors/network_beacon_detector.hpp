@@ -8,6 +8,6 @@ namespace kld
     {
     public:
         std::string name() const override;
-        DetectionResult scan() const override;
+        DetectionResult scan(OutputMode mode) const override;
     };
 }

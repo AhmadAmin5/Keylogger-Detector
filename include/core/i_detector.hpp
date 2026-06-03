@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/detection_result.hpp"
+#include "core/output_mode.hpp"
 #include <string>
 
 namespace kld
@@ -13,6 +14,6 @@ namespace kld
         // Human-readable detector name
         virtual std::string name() const = 0;
 
-        virtual DetectionResult scan() const = 0;
+        virtual DetectionResult scan(OutputMode mode) const = 0;
     };
 }

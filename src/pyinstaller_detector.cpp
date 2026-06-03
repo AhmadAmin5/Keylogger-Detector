@@ -1,6 +1,8 @@
 #include "detectors/pyinstaller_detector.hpp"
 #include "detectors/windows_inspection.hpp"
 
+#include <algorithm>
+#include <cwctype>
 #include <sstream>
 #include <vector>
 
@@ -24,6 +26,41 @@ namespace kld
             }
             return oss.str();
         }
+
+        bool is_legit_process(const std::wstring& imageName)
+        {
+            std::wstring lowerName = imageName;
+            std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(), [](wchar_t c) {
+                return std::towlower(c);
+            });
+
+            const std::vector<std::wstring> excluded_names = {
+                L"chrome.exe",
+                L"msedge.exe",
+                L"msedgewebview2.exe",
+                L"explorer.exe",
+                L"conhost.exe",
+                L"windefend.exe",
+                L"rtkauduservice64.exe",
+                L"widgets.exe",
+                L"fnhotkeyutility.exe",
+                L"trafficmonitor.exe",
+                L"shellhost.exe",
+                L"notepad.exe",
+                L"node.exe",
+                L"esrv.exe",
+                L"lenovovantage"
+            };
+
+            for (const auto& name : excluded_names)
+            {
+                if (lowerName.find(name) != std::wstring::npos)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     std::string PyInstallerDetector::name() const
@@ -31,7 +68,7 @@ namespace kld
         return "PyInstaller Detector";
     }
 
-    DetectionResult PyInstallerDetector::scan() const
+    DetectionResult PyInstallerDetector::scan(OutputMode mode) const
     {
         DetectionResult result;
         result.detectorName = name();
@@ -56,6 +93,11 @@ namespace kld
         for (const auto& proc : processes)
         {
             if (proc.pid == selfPid)
+            {
+                continue;
+            }
+
+            if (mode == OutputMode::SuspiciousScan && is_legit_process(proc.imageName))
             {
                 continue;
             }

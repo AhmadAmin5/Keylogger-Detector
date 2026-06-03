@@ -5,14 +5,36 @@
 #include "detectors/pyinstaller_detector.hpp"
 #include "helper.hpp"
 
+#include <iostream>
 #include <memory>
+#include <string>
 #include <vector>
+#include <conio.h>
 
 int main()
 {
     using namespace kld;
 
     print_banner();
+
+    std::cout << "Select scan mode:\n";
+    std::cout << "1. Full scan (shows all outputs)\n";
+    std::cout << "2. Suspicious scan (shows filtered outputs)\n";
+    std::cout << "Choice [1/2, default: 2]: ";
+    std::string choice;
+    std::getline(std::cin, choice);
+
+    OutputMode mode = OutputMode::SuspiciousScan;
+    if (choice == "1")
+    {
+        mode = OutputMode::FullScan;
+        std::cout << "\nRunning Full Scan...\n\n";
+    }
+    else
+    {
+        mode = OutputMode::SuspiciousScan;
+        std::cout << "\nRunning Suspicious Scan...\n\n";
+    }
 
     DetectorRegistry registry;
     registry.add(std::make_unique<PyInstallerDetector>());
@@ -25,7 +47,7 @@ int main()
 
     for (const auto& detector : registry.detectors())
     {
-        DetectionResult result = detector->scan();
+        DetectionResult result = detector->scan(mode);
 
         if (result.detectorName.empty())
         {
@@ -37,5 +59,7 @@ int main()
     }
 
     print_summary(results);
+
+    getch();
     return 0;
 }

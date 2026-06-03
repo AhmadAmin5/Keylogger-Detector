@@ -1,6 +1,8 @@
 #include "detectors/python_artifact_detector.hpp"
 #include "detectors/windows_inspection.hpp"
 
+#include <algorithm>
+#include <cwctype>
 #include <sstream>
 #include <vector>
 
@@ -24,6 +26,41 @@ namespace kld
             }
             return oss.str();
         }
+
+        bool is_legit_process(const std::wstring& imageName)
+        {
+            std::wstring lowerName = imageName;
+            std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(), [](wchar_t c) {
+                return std::towlower(c);
+            });
+
+            const std::vector<std::wstring> excluded_names = {
+                L"chrome.exe",
+                L"msedge.exe",
+                L"msedgewebview2.exe",
+                L"explorer.exe",
+                L"conhost.exe",
+                L"windefend.exe",
+                L"rtkauduservice64.exe",
+                L"widgets.exe",
+                L"fnhotkeyutility.exe",
+                L"trafficmonitor.exe",
+                L"shellhost.exe",
+                L"notepad.exe",
+                L"node.exe",
+                L"esrv.exe",
+                L"lenovovantage"
+            };
+
+            for (const auto& name : excluded_names)
+            {
+                if (lowerName.find(name) != std::wstring::npos)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     std::string PythonArtifactDetector::name() const
@@ -31,7 +68,7 @@ namespace kld
         return "Python Artifact Detector";
     }
 
-    DetectionResult PythonArtifactDetector::scan() const
+    DetectionResult PythonArtifactDetector::scan(OutputMode mode) const
     {
         DetectionResult result;
         result.detectorName = name();
@@ -66,6 +103,28 @@ namespace kld
             std::vector<std::string> hits;
             if (!proc.imagePath.empty() && file_contains_markers(proc.imagePath, markers, &hits))
             {
+                if (mode == OutputMode::SuspiciousScan)
+                {
+                    if (is_legit_process(proc.imageName))
+                    {
+                        continue;
+                    }
+
+                    bool hasHighlySuspiciousMarker = false;
+                    for (const auto& hit : hits)
+                    {
+                        if (hit == "pynput" || hit == "pynput.keyboard" || hit == "keyboard.Listener" || hit == "on_press")
+                        {
+                            hasHighlySuspiciousMarker = true;
+                            break;
+                        }
+                    }
+                    if (!hasHighlySuspiciousMarker)
+                    {
+                        continue;
+                    }
+                }
+
                 std::ostringstream line;
                 line << "PID " << proc.pid
                      << " | " << wide_to_utf8(proc.imageName)

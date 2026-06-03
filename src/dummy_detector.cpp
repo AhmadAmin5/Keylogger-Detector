@@ -7,8 +7,9 @@ namespace kld
         return "Dummy Detector";
     }
 
-    DetectionResult DummyDetector::scan() const
+    DetectionResult DummyDetector::scan(OutputMode mode) const
     {
+        (void)mode;
         DetectionResult result;
         result.detectorName = name();
         result.suspicious = false;

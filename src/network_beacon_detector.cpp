@@ -1,6 +1,8 @@
 #include "detectors/network_beacon_detector.hpp"
 #include "detectors/windows_inspection.hpp"
 
+#include <algorithm>
+#include <cctype>
 #include <sstream>
 #include <vector>
 
@@ -102,6 +104,42 @@ namespace kld
             }
             return oss.str();
         }
+
+        bool is_legit_process(const std::string& imageName)
+        {
+            std::string lowerName = imageName;
+            std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(), [](unsigned char c) {
+                return static_cast<char>(std::tolower(c));
+            });
+
+            const std::vector<std::string> excluded_names = {
+                "chrome.exe",
+                "msedge.exe",
+                "msedgewebview2.exe",
+                "explorer.exe",
+                "conhost.exe",
+                "windefend.exe",
+                "rtkauduservice64.exe",
+                "widgets.exe",
+                "fnhotkeyutility.exe",
+                "trafficmonitor.exe",
+                "shellhost.exe",
+                "notepad.exe",
+                "node.exe",
+                "esrv.exe",
+                "lenovovantage",
+                "antigravity ide.exe"
+            };
+
+            for (const auto& name : excluded_names)
+            {
+                if (lowerName.find(name) != std::string::npos)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     std::string NetworkBeaconDetector::name() const
@@ -109,7 +147,7 @@ namespace kld
         return "Network Beacon Detector";
     }
 
-    DetectionResult NetworkBeaconDetector::scan() const
+    DetectionResult NetworkBeaconDetector::scan(OutputMode mode) const
     {
         DetectionResult result;
         result.detectorName = name();
@@ -141,12 +179,18 @@ namespace kld
                 continue;
             }
 
+            std::string procName = process_name_for_pid(conn.pid);
+            if (mode == OutputMode::SuspiciousScan && is_legit_process(procName))
+            {
+                continue;
+            }
+
             foundSuspicious = true;
             score = std::max(score, (conn.remotePort == 8443) ? 90 : 70);
 
             std::ostringstream line;
             line << "PID " << conn.pid
-                 << " | " << process_name_for_pid(conn.pid)
+                 << " | " << procName
                  << " | " << wide_to_utf8(conn.localAddress) << ":" << conn.localPort
                  << " -> " << wide_to_utf8(conn.remoteAddress) << ":" << conn.remotePort
                  << " | state=" << state_to_text(conn.state);

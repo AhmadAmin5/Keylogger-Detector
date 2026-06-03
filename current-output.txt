@@ -1,0 +1,122 @@
+Microsoft Windows [Version 10.0.26200.8524]
+(c) Microsoft Corporation. All rights reserved.
+
+D:\Projects\Keylogger-Detector>C:
+
+C:\>cd users\ahmad\Desktop
+
+C:\Users\ahmad\Desktop>app.exe
+=====================================
+   Keylogger Detector - Lab Project
+=====================================
+
+[Detector] PyInstaller Detector
+  Suspicious : YES
+  Risk Score : 85 (Critical)
+  Details    : PyInstaller-style packed executable indicators found:
+PID 5240 | victim-http.exe | PyInstaller markers: PyInstaller, pyiboot01_bootstrap, pyimod01_archive, pyimod02_importers, MEIPASS, _PYI, pyi_rth
+PID 14900 | victim-http.exe | PyInstaller markers: PyInstaller, pyiboot01_bootstrap, pyimod01_archive, pyimod02_importers, MEIPASS, _PYI, pyi_rth
+
+[Detector] Python Artifact Detector
+  Suspicious : YES
+  Risk Score : 75 (High)
+  Details    : Python keylogger-style artifacts found:
+PID 10504 | esrv.exe | Python/package indicators: requests
+PID 19080 | msedgewebview2.exe | Python/package indicators: requests, threading
+PID 9836 | msedgewebview2.exe | Python/package indicators: requests, threading
+PID 17032 | msedgewebview2.exe | Python/package indicators: requests, threading
+PID 8688 | msedgewebview2.exe | Python/package indicators: requests, threading
+PID 13272 | msedgewebview2.exe | Python/package indicators: requests, threading
+PID 18560 | msedgewebview2.exe | Python/package indicators: requests, threading
+PID 12984 | msedgewebview2.exe | Python/package indicators: requests, threading
+PID 12612 | msedgewebview2.exe | Python/package indicators: requests, threading
+PID 17980 | msedgewebview2.exe | Python/package indicators: requests, threading
+PID 7876 | msedgewebview2.exe | Python/package indicators: requests, threading
+PID 14148 | msedgewebview2.exe | Python/package indicators: requests, threading
+PID 14504 | msedgewebview2.exe | Python/package indicators: requests, threading
+PID 14512 | chrome.exe | Python/package indicators: requests, threading
+PID 13780 | chrome.exe | Python/package indicators: requests, threading
+PID 2396 | chrome.exe | Python/package indicators: requests, threading
+PID 9464 | chrome.exe | Python/package indicators: requests, threading
+PID 20264 | chrome.exe | Python/package indicators: requests, threading
+PID 20356 | chrome.exe | Python/package indicators: requests, threading
+PID 20412 | chrome.exe | Python/package indicators: requests, threading
+PID 16280 | chrome.exe | Python/package indicators: requests, threading
+PID 10308 | chrome.exe | Python/package indicators: requests, threading
+PID 7248 | chrome.exe | Python/package indicators: requests, threading
+PID 13640 | chrome.exe | Python/package indicators: requests, threading
+PID 11540 | LenovoVantage-(GenericMessagingAddin).exe | Python/package indicators: requests
+PID 5240 | victim-http.exe | Python/package indicators: pynput, pynput.keyboard, requests, urllib3, certifi, threading
+PID 14900 | victim-http.exe | Python/package indicators: pynput, pynput.keyboard, requests, urllib3, certifi, threading
+PID 20368 | Notepad.exe | Python/package indicators: requests
+PID 15984 | node.exe | Python/package indicators: requests, certifi, threading, buffer = []
+PID 11752 | node.exe | Python/package indicators: requests, certifi, threading, buffer = []
+PID 19620 | node.exe | Python/package indicators: requests, certifi, threading, buffer = []
+PID 18972 | node.exe | Python/package indicators: requests, certifi, threading, buffer = []
+PID 17452 | chrome.exe | Python/package indicators: requests, threading
+PID 12544 | chrome.exe | Python/package indicators: requests, threading
+PID 3800 | chrome.exe | Python/package indicators: requests, threading
+
+[Detector] Network Beacon Detector
+  Suspicious : YES
+  Risk Score : 70 (High)
+  Details    : Suspicious outbound beacon-style TCP activity found:
+PID 9752 | Antigravity IDE.exe | 127.0.0.1:22380 -> 127.0.0.1:8430 | state=ESTABLISHED
+
+[Detector] Keyboard Hook Heuristic Detector
+  Suspicious : YES
+  Risk Score : 80 (Critical)
+  Details    : Keyboard-hook / key-capture heuristic matched:
+PID 4344 | conhost.exe | keyboard-capture indicators: SetWindowsHookEx, GetKeyState
+PID 14020 | FnHotkeyUtility.exe | keyboard-capture indicators: GetAsyncKeyState, GetKeyState, Listener
+PID 18172 | explorer.exe | keyboard-capture indicators: GetAsyncKeyState, SetWindowsHookEx, GetKeyState, Listener
+PID 16668 | Widgets.exe | keyboard-capture indicators: GetKeyState, Listener
+PID 19080 | msedgewebview2.exe | keyboard-capture indicators: Listener
+PID 9836 | msedgewebview2.exe | keyboard-capture indicators: Listener
+PID 17032 | msedgewebview2.exe | keyboard-capture indicators: Listener
+PID 8688 | msedgewebview2.exe | keyboard-capture indicators: Listener
+PID 13272 | msedgewebview2.exe | keyboard-capture indicators: Listener
+PID 18560 | msedgewebview2.exe | keyboard-capture indicators: Listener
+PID 10272 | TrafficMonitor.exe | keyboard-capture indicators: GetKeyState
+PID 1036 | RtkAudUService64.exe | keyboard-capture indicators: SetWindowsHookEx
+PID 1196 | windefend.exe | keyboard-capture indicators: GetAsyncKeyState, GetKeyState
+PID 12984 | msedgewebview2.exe | keyboard-capture indicators: Listener
+PID 12612 | msedgewebview2.exe | keyboard-capture indicators: Listener
+PID 17980 | msedgewebview2.exe | keyboard-capture indicators: Listener
+PID 7876 | msedgewebview2.exe | keyboard-capture indicators: Listener
+PID 14148 | msedgewebview2.exe | keyboard-capture indicators: Listener
+PID 14504 | msedgewebview2.exe | keyboard-capture indicators: Listener
+PID 14512 | chrome.exe | keyboard-capture indicators: Listener
+PID 13780 | chrome.exe | keyboard-capture indicators: Listener
+PID 2396 | chrome.exe | keyboard-capture indicators: Listener
+PID 9464 | chrome.exe | keyboard-capture indicators: Listener
+PID 20264 | chrome.exe | keyboard-capture indicators: Listener
+PID 20356 | chrome.exe | keyboard-capture indicators: Listener
+PID 20412 | chrome.exe | keyboard-capture indicators: Listener
+PID 16280 | chrome.exe | keyboard-capture indicators: Listener
+PID 10308 | chrome.exe | keyboard-capture indicators: Listener
+PID 7248 | chrome.exe | keyboard-capture indicators: Listener
+PID 13640 | chrome.exe | keyboard-capture indicators: Listener
+PID 14984 | ShellHost.exe | keyboard-capture indicators: Listener
+PID 5240 | victim-http.exe | keyboard-capture indicators: pynput.keyboard
+PID 14900 | victim-http.exe | keyboard-capture indicators: pynput.keyboard
+PID 20368 | Notepad.exe | keyboard-capture indicators: SetWindowsHookEx, GetKeyState
+PID 12600 | conhost.exe | keyboard-capture indicators: SetWindowsHookEx, GetKeyState
+PID 15984 | node.exe | keyboard-capture indicators: GetAsyncKeyState, SetWindowsHookEx, GetKeyState, Listener
+PID 11752 | node.exe | keyboard-capture indicators: GetAsyncKeyState, SetWindowsHookEx, GetKeyState, Listener
+PID 20200 | conhost.exe | keyboard-capture indicators: SetWindowsHookEx, GetKeyState
+PID 19620 | node.exe | keyboard-capture indicators: GetAsyncKeyState, SetWindowsHookEx, GetKeyState, Listener
+PID 18972 | node.exe | keyboard-capture indicators: GetAsyncKeyState, SetWindowsHookEx, GetKeyState, Listener
+PID 17748 | conhost.exe | keyboard-capture indicators: SetWindowsHookEx, GetKeyState
+PID 12544 | chrome.exe | keyboard-capture indicators: Listener
+PID 3800 | chrome.exe | keyboard-capture indicators: Listener
+
+=====================================
+Summary
+-------------------------------------
+Detectors run : 4
+Any suspicious: YES
+Highest score  : 85 (Critical)
+=====================================
+
+C:\Users\ahmad\Desktop>
