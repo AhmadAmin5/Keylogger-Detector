@@ -69,103 +69,130 @@ namespace kld
     }
 
     DetectionResult PythonArtifactDetector::scan(OutputMode mode) const
+{
+    DetectionResult result;
+    result.detectorName = name();
+
+    const DWORD selfPid = GetCurrentProcessId();
+    const std::wstring selfName = get_current_process_image_name();
+
+    const std::vector<std::string> markers =
     {
-        DetectionResult result;
-        result.detectorName = name();
+        "pynput",
+        "pynput.keyboard",
+        "requests",
+        "urllib3",
+        "certifi",
+        "C2_URL",
+        "verify=False",
+        "keyboard.Listener",
+        "on_press",
+        "threading",
+        "buffer = []"
+    };
 
-        const DWORD selfPid = GetCurrentProcessId();
-        const std::wstring selfName = get_current_process_image_name();
+    const auto processes = enumerate_processes();
 
-        const std::vector<std::string> markers =
+    std::vector<std::string> evidence;
+    bool foundSuspiciousProcess = false;
+
+    for (const auto& proc : processes)
+    {
+        if (proc.pid == selfPid)
         {
-            "pynput",
-            "pynput.keyboard",
-            "requests",
-            "urllib3",
-            "certifi",
-            "C2_URL",
-            "verify=False",
-            "keyboard.Listener",
-            "on_press",
-            "threading",
-            "buffer = []"
-        };
+            continue;
+        }
 
-        const auto processes = enumerate_processes();
-        std::vector<std::string> evidence;
-
-        for (const auto& proc : processes)
-        {
-            if (proc.pid == selfPid)
+        std::wstring lowerName = proc.imageName;
+        std::transform(
+            lowerName.begin(),
+            lowerName.end(),
+            lowerName.begin(),
+            [](wchar_t c)
             {
-                continue;
-            }
-
-            std::wstring lowerName = proc.imageName;
-            std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(), [](wchar_t c) {
                 return std::towlower(c);
             });
-            if (lowerName == selfName)
-            {
-                continue;
-            }
 
-            std::vector<std::string> hits;
-            if (!proc.imagePath.empty() && file_contains_markers(proc.imagePath, markers, &hits))
-            {
-                if (mode == OutputMode::SuspiciousScan)
-                {
-                    if (is_legit_process(proc.imageName))
-                    {
-                        continue;
-                    }
-
-                    bool hasHighlySuspiciousMarker = false;
-                    for (const auto& hit : hits)
-                    {
-                        if (hit == "pynput" || hit == "pynput.keyboard" || hit == "keyboard.Listener" || hit == "on_press")
-                        {
-                            hasHighlySuspiciousMarker = true;
-                            break;
-                        }
-                    }
-                    if (!hasHighlySuspiciousMarker)
-                    {
-                        continue;
-                    }
-                }
-
-                std::ostringstream line;
-                line << "PID " << proc.pid
-                     << " | " << wide_to_utf8(proc.imageName)
-                     << " | Python/package indicators: ";
-
-                for (std::size_t i = 0; i < hits.size(); ++i)
-                {
-                    if (i != 0)
-                    {
-                        line << ", ";
-                    }
-                    line << hits[i];
-                }
-
-                evidence.push_back(line.str());
-            }
+        if (lowerName == selfName)
+        {
+            continue;
         }
+
+        std::vector<std::string> hits;
+
+        if (!proc.imagePath.empty() &&
+            file_contains_markers(proc.imagePath, markers, &hits))
+        {
+            const bool legitProcess = is_legit_process(proc.imageName);
+
+            //
+            // Detection logic (independent of output mode)
+            //
+            if (!legitProcess)
+            {
+                foundSuspiciousProcess = true;
+            }
+
+            //
+            // Output filtering
+            //
+            if (mode == OutputMode::SuspiciousScan)
+            {
+                if (legitProcess)
+                {
+                    continue;
+                }
+            }
+
+            std::ostringstream line;
+
+            line << "PID "
+                 << proc.pid
+                 << " | "
+                 << wide_to_utf8(proc.imageName)
+                 << " | Python/package indicators: ";
+
+            for (std::size_t i = 0; i < hits.size(); ++i)
+            {
+                if (i != 0)
+                {
+                    line << ", ";
+                }
+
+                line << hits[i];
+            }
+
+            evidence.push_back(line.str());
+        }
+    }
+
+    //
+    // Final result
+    //
+    if (foundSuspiciousProcess)
+    {
+        result.suspicious = true;
+        result.riskScore = 75;
 
         if (!evidence.empty())
         {
-            result.suspicious = true;
-            result.riskScore = 75;
-            result.details = "Python keylogger-style artifacts found:\n" + join_lines(evidence);
+            result.details =
+                "Python keylogger-style artifacts found:\n" +
+                join_lines(evidence);
         }
         else
         {
-            result.suspicious = false;
-            result.riskScore = 0;
-            result.details = "No suspicious Python package markers were found in running processes.";
+            result.details =
+                "Suspicious non-legitimate process detected but hidden by the current output mode.";
         }
-
-        return result;
     }
-}
+    else
+    {
+        result.suspicious = false;
+        result.riskScore = 0;
+        result.details =
+            "No suspicious non-legitimate processes were found.";
+    }
+
+    return result;
+}}

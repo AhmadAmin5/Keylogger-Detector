@@ -89,7 +89,9 @@ namespace kld
         };
 
         const auto processes = enumerate_processes();
+
         std::vector<std::string> evidence;
+        bool foundSuspiciousProcess = false;
         int score = 0;
 
         for (const auto& proc : processes)
@@ -100,47 +102,58 @@ namespace kld
             }
 
             std::wstring lowerName = proc.imageName;
-            std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(), [](wchar_t c) {
-                return std::towlower(c);
-            });
+            std::transform(
+                lowerName.begin(),
+                lowerName.end(),
+                lowerName.begin(),
+                [](wchar_t c)
+                {
+                    return std::towlower(c);
+                });
+
             if (lowerName == selfName)
             {
                 continue;
             }
 
             std::vector<std::string> hits;
-            if (!proc.imagePath.empty() && file_contains_markers(proc.imagePath, markers, &hits))
+
+            if (!proc.imagePath.empty() &&
+                file_contains_markers(proc.imagePath, markers, &hits))
             {
+                const bool legitProcess = is_legit_process(proc.imageName);
+
+                //
+                // Detection logic
+                //
+                if (!legitProcess)
+                {
+                    foundSuspiciousProcess = true;
+                }
+
+                //
+                // Output filtering only
+                //
                 if (mode == OutputMode::SuspiciousScan)
                 {
-                    if (is_legit_process(proc.imageName))
-                    {
-                        continue;
-                    }
-
-                    bool hasHighlySuspiciousMarker = false;
-                    for (const auto& hit : hits)
-                    {
-                        if (hit == "pynput.keyboard" || hit == "keyboard.Listener" || hit == "on_press" || hit == "WH_KEYBOARD_LL")
-                        {
-                            hasHighlySuspiciousMarker = true;
-                            break;
-                        }
-                    }
-                    if (!hasHighlySuspiciousMarker)
+                    if (legitProcess)
                     {
                         continue;
                     }
                 }
 
                 int localScore = 0;
+
                 for (const auto& hit : hits)
                 {
-                    if (hit == "WH_KEYBOARD_LL" || hit == "SetWindowsHookEx" || hit == "GetAsyncKeyState")
+                    if (hit == "WH_KEYBOARD_LL" ||
+                        hit == "SetWindowsHookEx" ||
+                        hit == "GetAsyncKeyState")
                     {
                         localScore += 30;
                     }
-                    else if (hit == "pynput.keyboard" || hit == "keyboard.Listener")
+                    else if (hit == "pynput.keyboard" ||
+                            hit == "keyboard.Listener")
                     {
                         localScore += 20;
                     }
@@ -153,9 +166,12 @@ namespace kld
                 score = std::max(score, std::min(localScore, 95));
 
                 std::ostringstream line;
-                line << "PID " << proc.pid
-                     << " | " << wide_to_utf8(proc.imageName)
-                     << " | keyboard-capture indicators: ";
+
+                line << "PID "
+                    << proc.pid
+                    << " | "
+                    << wide_to_utf8(proc.imageName)
+                    << " | keyboard-capture indicators: ";
 
                 for (std::size_t i = 0; i < hits.size(); ++i)
                 {
@@ -163,6 +179,7 @@ namespace kld
                     {
                         line << ", ";
                     }
+
                     line << hits[i];
                 }
 
@@ -170,17 +187,32 @@ namespace kld
             }
         }
 
-        if (!evidence.empty())
+        //
+        // Final verdict
+        //
+        if (foundSuspiciousProcess)
         {
             result.suspicious = true;
             result.riskScore = std::max(score, 65);
-            result.details = "Keyboard-hook / key-capture heuristic matched:\n" + join_lines(evidence);
+
+            if (!evidence.empty())
+            {
+                result.details =
+                    "Keyboard-hook / key-capture heuristic matched:\n" +
+                    join_lines(evidence);
+            }
+            else
+            {
+                result.details =
+                    "Suspicious non-legitimate process detected.";
+            }
         }
         else
         {
             result.suspicious = false;
             result.riskScore = 0;
-            result.details = "No keyboard-hook heuristic markers were found in running processes.";
+            result.details =
+                "No suspicious non-legitimate processes were found.";
         }
 
         return result;
