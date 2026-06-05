@@ -51,7 +51,11 @@ namespace kld
                 L"esrv.exe",
                 L"lenovovantage",
                 L"windowsterminal.exe",
-                L"openconsole.exe"
+                L"openconsole.exe",
+                L"idman.exe",
+                L"git.exe",
+                L"git-remote-https.exe",
+                L"git-remote-http.exe"
             };
 
             for (const auto& name : excluded_names)

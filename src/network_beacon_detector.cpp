@@ -232,7 +232,14 @@ namespace kld
                 "trafficmonitor.exe",
                 "rtkauduservice64.exe",
                 "lenovovantage",
-                "esrv.exe"
+                "esrv.exe",
+
+                "idman.exe",
+                "git.exe",
+                "git-remote-https.exe",
+                "git-remote-http.exe",
+
+                "BackgroundDownload.exe",
             };
 
             for (const auto& entry : whitelist)
@@ -269,7 +276,7 @@ namespace kld
                 score += 10;
             }
 
-            return std::min(score, 100);
+            return std::min(score, 60);
         }
     }
 
